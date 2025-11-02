@@ -1,0 +1,58 @@
+@startuml
+actor Student
+participant "UI\nUser Interface" as UI
+participant "CS\nCourseService" as CS
+participant "DB\nJsonDatabaseManager" as DB
+participant "ES\nEmailService" as ES
+
+Student -> UI: Select Course to Enroll
+activate UI
+
+UI -> CS: enrollInCourse(studentId, courseId)
+activate CS
+
+CS -> DB: getCourse(courseId)
+activate DB
+DB --> CS: Course Details
+deactivate DB
+
+CS -> DB: getStudent(studentId)
+activate DB
+DB --> CS: Student Details
+deactivate DB
+
+CS -> CS: checkIfAlreadyEnrolled()
+
+alt Already Enrolled
+    CS --> UI: Error: Already Enrolled
+    UI --> Student: Display Error Message
+else Not Enrolled
+    CS -> CS: checkPrerequisites()
+    
+    alt Prerequisites Not Met
+        CS --> UI: Error: Prerequisites Not Met
+        UI --> Student: Display Error Message
+    else Prerequisites Met
+        CS -> DB: createEnrollment(studentId, courseId)
+        activate DB
+        DB --> CS: Enrollment Created
+        deactivate DB
+        
+        CS -> DB: updateStudentCourses(studentId, courseId)
+        activate DB
+        DB --> CS: Updated Successfully
+        deactivate DB
+        
+        CS -> ES: sendConfirmationEmail(student, course)
+        activate ES
+        ES --> CS: Email Sent
+        deactivate ES
+        
+        CS --> UI: Success: Enrollment Complete
+        UI --> Student: Display Success Message
+    end
+end
+
+deactivate CS
+deactivate UI
+@enduml
