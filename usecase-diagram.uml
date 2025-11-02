@@ -1,0 +1,106 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+' The three main people who use our platform
+actor Student
+actor Instructor  
+actor Admin
+
+rectangle "SkillForge Platform" {
+  
+  ' What students can do
+  usecase "Browse Courses" as UC1
+  usecase "Enroll in Course" as UC2
+  usecase "Complete Lesson" as UC3
+  usecase "Take Quiz" as UC4
+  usecase "View Certificate" as UC5
+  usecase "Track Progress" as UC6
+  
+  ' What instructors can do
+  usecase "Create Course" as UC7
+  usecase "Manage Course" as UC8
+  usecase "Upload Lesson" as UC9
+  usecase "Design Quiz" as UC10
+  usecase "Add Questions" as UC11
+  
+  ' What admins can do
+  usecase "Manage Users" as UC12
+  usecase "Approve Course" as UC13
+  usecase "Remove Course" as UC14
+  usecase "Monitor Platform Analytics" as UC15
+  
+  ' Things everyone needs to do
+  usecase "Login" as UC16
+  usecase "Register" as UC17
+  
+  ' Things the system does automatically
+  usecase "Generate Certificate" as UC18
+  usecase "Update Analytics" as UC19
+  usecase "Validate Quiz Result" as UC20
+  
+  ' Connecting students to their actions
+  Student --> UC1
+  Student --> UC2
+  Student --> UC3
+  Student --> UC4
+  Student --> UC5
+  Student --> UC6
+  Student --> UC16
+  Student --> UC17
+  
+  ' Connecting instructors to their actions
+  Instructor --> UC7
+  Instructor --> UC8
+  Instructor --> UC9
+  Instructor --> UC10
+  Instructor --> UC16
+  Instructor --> UC17
+  
+  ' Connecting admins to their actions
+  Admin --> UC12
+  Admin --> UC13
+  Admin --> UC14
+  Admin --> UC15
+  Admin --> UC16
+  
+  ' These actions require login first
+  UC2 ..> UC16 : <<include>>
+  UC3 ..> UC16 : <<include>>
+  UC4 ..> UC16 : <<include>>
+  UC7 ..> UC16 : <<include>>
+  UC8 ..> UC16 : <<include>>
+  UC12 ..> UC16 : <<include>>
+  UC13 ..> UC16 : <<include>>
+  UC14 ..> UC16 : <<include>>
+  
+  ' These need course management open first
+  UC9 ..> UC8 : <<include>>
+  UC10 ..> UC8 : <<include>>
+  UC11 ..> UC10 : <<include>>
+  
+  ' Quiz always gets validated
+  UC4 ..> UC20 : <<include>>
+  
+  ' These might happen as bonus features
+  UC18 ..> UC4 : <<extend>>
+  UC19 ..> UC3 : <<extend>>
+  UC19 ..> UC4 : <<extend>>
+  
+  ' These are specific types of course management
+  UC13 --|> UC8
+  UC14 --|> UC8
+}
+
+note right of UC18
+  Certificate generated when
+  all lessons completed and
+  all quizzes passed
+end note
+
+note bottom of UC19
+  Analytics automatically updated
+  when students complete activities
+end note
+
+@enduml
